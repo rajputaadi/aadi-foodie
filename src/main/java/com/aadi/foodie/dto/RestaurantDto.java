@@ -1,31 +1,25 @@
-package com.aadi.foodie.entity;
+package com.aadi.foodie.dto;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import com.aadi.foodie.entity.User;
+import jakarta.persistence.ManyToOne;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Entity
-@Table(name = "foodie_restaurant")
 @Getter
 @Setter
-public class Restaurant {
-
-    @Id
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class RestaurantDto {
     private String id;
     private String name;
     private String address;
     private LocalTime openTime;
-    private LocalTime closeTime;
     private LocalDate createdDate;
+    private LocalTime closeTime;
     private String banner;
-    @Lob
     private String description;
-
-    @Column(name = "is_open", nullable = false)
     private boolean open = true;
-    @ManyToOne
-    User user;
 }
