@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,7 @@ public class User {
     private String name;
     private String email;
     private String password;
+    private String createdAt;
     private String address;
     private String phoneNumber;
     @Enumerated(EnumType.STRING)
@@ -34,6 +36,21 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<RoleEntity> roleEntities = new ArrayList<>();
+
+    @PrePersist
+    public void preSave(){
+        this.createdAt = LocalDateTime.now().toString();
+    }
+
+    @PostPersist
+    public void postSave(){
+        System.out.println("Entity saved " + this.getName());
+    }
+
+    @PreUpdate
+    public void preUpdate(){
+
+    }
 
 
 }
