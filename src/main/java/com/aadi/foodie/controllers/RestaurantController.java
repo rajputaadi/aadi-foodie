@@ -1,7 +1,10 @@
 package com.aadi.foodie.controllers;
 
 import com.aadi.foodie.dto.RestaurantDto;
+import com.aadi.foodie.service.FileService;
 import com.aadi.foodie.service.RestaurantService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,18 +13,23 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/restaurants")
 public class RestaurantController {
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private RestaurantService restaurantService;
+    private FileService fileService;
 
     @Autowired
-    public RestaurantController(RestaurantService restaurantService) {
+    public RestaurantController(RestaurantService restaurantService, FileService fileService) {
         this.restaurantService = restaurantService;
+        this.fileService = fileService;
     }
 
     //add restaurant API
@@ -68,6 +76,19 @@ public class RestaurantController {
     @DeleteMapping("/{restaurantId}")
     public ResponseEntity<RestaurantDto> delete(@PathVariable String restaurantId) {
         return ResponseEntity.status(HttpStatus.OK).body(restaurantService.delete(restaurantId));
+    }
+
+    //api to handle banner upload
+    @PostMapping("/upload-banner/{restaurantId}")
+    public ResponseEntity<?> uploadFile(
+            @RequestParam("banner") MultipartFile banner,
+            @PathVariable String restaurantId) throws IOException {
+        logger.info("Uploading banner ---->");
+        logger.info("uploading " + banner.getOriginalFilename());
+        logger.info("uploading " + banner.getContentType());
+
+
+
     }
 
 }

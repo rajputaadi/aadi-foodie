@@ -3,6 +3,7 @@ package com.aadi.foodie.service;
 import com.aadi.foodie.dto.RestaurantDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -20,4 +21,6 @@ public interface RestaurantService {
     List<RestaurantDto> searchByName(String name);
 
     Page<RestaurantDto> getOpenRestaurants(Pageable pageable);
+
+    RestaurantDto uploadBanner(MultipartFile file, String id);
 }

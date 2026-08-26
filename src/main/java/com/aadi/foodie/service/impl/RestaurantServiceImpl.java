@@ -1,16 +1,20 @@
 package com.aadi.foodie.service.impl;
 
+import com.aadi.foodie.dto.FileData;
 import com.aadi.foodie.dto.RestaurantDto;
 import com.aadi.foodie.entity.Restaurant;
 import com.aadi.foodie.exception.ResourceNotFoundException;
 import com.aadi.foodie.repository.RestaurantRepo;
+import com.aadi.foodie.service.FileService;
 import com.aadi.foodie.service.RestaurantService;
 import com.aadi.foodie.utils.Helper;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,11 +22,13 @@ import java.util.Optional;
 public class RestaurantServiceImpl implements RestaurantService {
     private RestaurantRepo restaurantRepo;
     private ModelMapper modelMapper;
+    private FileService fileService;
 
 
-    public RestaurantServiceImpl(RestaurantRepo restaurantRepo, ModelMapper modelMapper) {
+    public RestaurantServiceImpl(RestaurantRepo restaurantRepo, ModelMapper modelMapper , FileService fileService) {
         this.restaurantRepo = restaurantRepo;
         this.modelMapper = modelMapper;
+        this.fileService =  fileService;
     }
 
     @Override
@@ -82,4 +88,9 @@ public class RestaurantServiceImpl implements RestaurantService {
         Page<Restaurant> restaurantPage = restaurantRepo.findByOpen(true, pageable);
         return restaurantPage.map(item -> modelMapper.map(item, RestaurantDto.class));
     }
+
+    @Override
+    public RestaurantDto uploadBanner(MultipartFile file, String id) {
+    }
+
 }
