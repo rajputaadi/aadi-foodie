@@ -8,6 +8,7 @@ import com.aadi.foodie.service.UserService;
 import com.aadi.foodie.utils.Helper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,11 +18,13 @@ import java.util.stream.Stream;
 @Service
 public class UserServiceImpl implements UserService {
 
-    public UserServiceImpl(UserRepo userRepo) {
-        this.userRepo = userRepo;
-    }
+    private final UserRepo userRepo;
+    private final PasswordEncoder passwordEncoder;
 
-    private UserRepo userRepo;
+    public UserServiceImpl(UserRepo userRepo, PasswordEncoder passwordEncoder) {
+        this.userRepo = userRepo;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     private User convertUserDtoToUser(UserDto userDto) {
         User user = new User();
@@ -49,6 +52,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto saveUser(UserDto userDto) {
         userDto.setId(Helper.generateRandomId());
+        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
         User savedUser = userRepo.save(convertUserDtoToUser(userDto));
         return convertUserToUserDto(savedUser);
     }
@@ -74,8 +78,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUsersByEmail(String email) {
-        UserDto user = userRepo.findByEmail(email);
-        return user;
+        User user = userRepo.findByEmail(email);
+        return user != null ? convertUserToUserDto(user) : null;
     }
 
     @Override

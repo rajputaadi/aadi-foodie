@@ -1,7 +1,6 @@
 package com.aadi.foodie.controllers;
 
 import com.aadi.foodie.dto.RestaurantDto;
-import com.aadi.foodie.service.FileService;
 import com.aadi.foodie.service.RestaurantService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,12 +23,10 @@ public class RestaurantController {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private RestaurantService restaurantService;
-    private FileService fileService;
 
     @Autowired
-    public RestaurantController(RestaurantService restaurantService, FileService fileService) {
+    public RestaurantController(RestaurantService restaurantService) {
         this.restaurantService = restaurantService;
-        this.fileService = fileService;
     }
 
     //add restaurant API
@@ -86,9 +83,8 @@ public class RestaurantController {
         logger.info("Uploading banner ---->");
         logger.info("uploading " + banner.getOriginalFilename());
         logger.info("uploading " + banner.getContentType());
-
-
-
+        RestaurantDto updatedRestaurantDto = restaurantService.uploadBanner(banner, restaurantId);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedRestaurantDto);
     }
 
 }

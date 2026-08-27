@@ -1,34 +1,34 @@
 package com.aadi.foodie.service.impl;
 
-import com.aadi.foodie.dto.FileData;
 import com.aadi.foodie.dto.RestaurantDto;
 import com.aadi.foodie.entity.Restaurant;
 import com.aadi.foodie.exception.ResourceNotFoundException;
 import com.aadi.foodie.repository.RestaurantRepo;
-import com.aadi.foodie.service.FileService;
 import com.aadi.foodie.service.RestaurantService;
 import com.aadi.foodie.utils.Helper;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Date;
+import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 @Service
 public class RestaurantServiceImpl implements RestaurantService {
     private RestaurantRepo restaurantRepo;
     private ModelMapper modelMapper;
-    private FileService fileService;
+    @Autowired
+    private Cloudinary cloudinary;
 
-
-    public RestaurantServiceImpl(RestaurantRepo restaurantRepo, ModelMapper modelMapper , FileService fileService) {
+    public RestaurantServiceImpl(RestaurantRepo restaurantRepo, ModelMapper modelMapper) {
         this.restaurantRepo = restaurantRepo;
         this.modelMapper = modelMapper;
-        this.fileService =  fileService;
     }
 
     @Override
@@ -91,6 +91,27 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Override
     public RestaurantDto uploadBanner(MultipartFile file, String id) {
+        Restaurant restaurant = restaurantRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Restaurant not found"));
+        try {
+            Map uploadResult = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap(
+                            "folder", "restaurant_banners",
+                            "public_id", "restaurant_" + id,
+                            "overwrite", true,
+                            "resource_type", "image"
+                    )
+            );
+
+            String secureUrl = (String) uploadResult.get("secure_url");
+            restaurant.setBanner(secureUrl);
+            restaurantRepo.save(restaurant);
+            return modelMapper.map(restaurant, RestaurantDto.class);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload banner" + e.getMessage(), e);
+        }
     }
+
+    ;
 
 }
