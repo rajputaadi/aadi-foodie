@@ -1,15 +1,10 @@
 package com.aadi.foodie.dto;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
-
-public class JwtResponse {
-    private String accessToken;
+public class RefreshTokenRequest {
     private String refreshToken;
-    private UserDto userDetails;
 }

@@ -1,15 +1,17 @@
-package com.aadi.foodie.Security;
+package com.aadi.foodie.service;
 
 import com.aadi.foodie.dto.UserDto;
-import com.aadi.foodie.service.UserService;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
+import java.util.List;
 
+// used only by AuthenticationManager.authenticate() during /api/v1/auth/login;
+// role-based authorization on later requests comes from JwtAuthenticationFilter instead.
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
@@ -25,10 +27,17 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (userDto == null) {
             throw new UsernameNotFoundException("User not found with email: " + email);
         }
-        return User.builder()
-                .username(userDto.getEmail())
+
+        List<GrantedAuthority> authorities = userDto.getRoleEntities() == null
+                ? List.of()
+                : userDto.getRoleEntities().stream()
+                        .map(role -> (GrantedAuthority) new SimpleGrantedAuthority(role.getName()))
+                        .toList();
+
+        return org.springframework.security.core.userdetails.User
+                .withUsername(userDto.getEmail())
                 .password(userDto.getPassword())
-                .authorities(Collections.emptyList())
+                .authorities(authorities)
                 .build();
     }
 }

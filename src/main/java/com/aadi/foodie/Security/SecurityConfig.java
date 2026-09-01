@@ -1,5 +1,6 @@
 package com.aadi.foodie.Security;
 
+import com.aadi.foodie.utils.AppConstants;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,12 +25,27 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(e -> e.disable())
-                .authorizeHttpRequests(rerequest ->
-                        rerequest.requestMatchers("/api/v1/auth/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/**")
-                                .permitAll()
-                                .anyRequest().authenticated()
+                .authorizeHttpRequests(request -> request
+
+                        .requestMatchers("/error")
+                        .permitAll()
+
+                        .requestMatchers("/api/v1/auth/**")
+                        .permitAll()
+
+                        .requestMatchers(HttpMethod.POST, "/api/v1/users")
+                        .permitAll()
+
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**", "/api/v1/restaurants/**")
+                        .hasRole(AppConstants.ROLE_ADMIN)
+
+                        .requestMatchers(HttpMethod.GET, "/api/v1/restaurants/**")
+                        .hasRole(AppConstants.ROLE_ADMIN)
+
+                        .requestMatchers(HttpMethod.GET, "/api/v1/**")
+                        .permitAll()
+
+                        .anyRequest().authenticated()
                 );
 
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
